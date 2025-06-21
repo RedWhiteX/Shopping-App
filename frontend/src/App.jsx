@@ -1,3 +1,4 @@
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -19,6 +20,9 @@ import { Toaster } from 'react-hot-toast';
 import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 
+// Import the ThemeProvider component
+import { ThemeProvider } from './ui_components/theme_provider'; // Adjust this path if your components folder is located differently
+
 function App() {
   function Logout() {
     localStorage.clear();
@@ -26,34 +30,40 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <CartProvider>
-        <Toaster position="top-right" reverseOrder={false} />
-        <Routes>
-          <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route path="/" element={<Home />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/productdetail/:id" element={<ProductDetail />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/help-center" element={<HelpCenter />} />
-            <Route path="/returns" element={<Returns />} />
-            <Route path="/shipping" element={<Shipping />} />
-            <Route path="/cart" element={<Cart/>}/>
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
-          {/* You can add more protected routes here, all under Layout */}
-         </Route>
+    // Wrap your entire application with ThemeProvider
+    // This makes the theme context available to all components within your app
+    <ThemeProvider defaultTheme="white" storageKey="vite-ui-theme">
+      <BrowserRouter>
+        <CartProvider>
+          <Toaster position="top-right" reverseOrder={false} />
+          <Routes>
+            {/* Protected Routes (require authentication) */}
+            <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+              <Route path="/" element={<Home />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/productdetail/:id" element={<ProductDetail />} />
+              <Route path="/careers" element={<CareersPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/help-center" element={<HelpCenter />} />
+              <Route path="/returns" element={<Returns />} />
+              <Route path="/shipping" element={<Shipping />} />
+              <Route path="/cart" element={<Cart/>}/>
+              <Route path="/checkout" element={<Checkout />} />
+              {/* Profile page is also protected */}
+              <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
+              {/* You can add more protected routes here, all under Layout */}
+            </Route>
 
-        {/* Public Routes (no layout) */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      </CartProvider>
-    </BrowserRouter>
+            {/* Public Routes (no layout, accessible without authentication) */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="*" element={<NotFound />} /> {/* Catch-all for undefined routes */}
+          </Routes>
+        </CartProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

@@ -1,6 +1,9 @@
+import React from 'react'; // Ensure React is imported
+
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white mt-10">
+    // Footer remains explicitly dark with white/gray text
+    <footer className="bg-gray-900 text-white dark:bg-black dark:text-white mt-10">
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-6">
         <div>
           <h3 className="text-lg font-bold mb-2">ShopEase</h3>
@@ -13,17 +16,17 @@ export default function Footer() {
           <h4 className="font-semibold mb-2">Company</h4>
           <ul className="space-y-1 text-sm">
             <li>
-              <a href="/about" className="hover:underline">
+              <a href="/about" className="hover:underline hover:text-gray-100">
                 About Us
               </a>
             </li>
             <li>
-              <a href="/careers" className="hover:underline">
+              <a href="/careers" className="hover:underline hover:text-gray-100">
                 Careers
               </a>
             </li>
             <li>
-              <a href="/blog" className="hover:underline">
+              <a href="/blog" className="hover:underline hover:text-gray-100">
                 Blog
               </a>
             </li>
@@ -33,17 +36,17 @@ export default function Footer() {
           <h4 className="font-semibold mb-2">Support</h4>
           <ul className="space-y-1 text-sm">
             <li>
-              <a href="/help-center" className="hover:underline">
+              <a href="/help-center" className="hover:underline hover:text-gray-100">
                 Help Center
               </a>
             </li>
             <li>
-              <a href="/returns" className="hover:underline">
+              <a href="/returns" className="hover:underline hover:text-gray-100">
                 Returns
               </a>
             </li>
             <li>
-              <a href="/shipping" className="hover:underline">
+              <a href="/shipping" className="hover:underline hover:text-gray-100">
                 Shipping
               </a>
             </li>
@@ -52,7 +55,7 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-2">Follow Us</h4>
           <ul className="space-y-1 text-sm">
-            {/* Instagram */}
+            {/* Instagram - hover text remains pink */}
             <li>
               <a
                 href="https://instagram.com/ali_abbas711"
@@ -73,7 +76,7 @@ export default function Footer() {
                 Instagram
               </a>
             </li>
-            {/* Facebook */}
+            {/* Facebook - hover text remains blue */}
             <li>
               <a
                 href="https://web.facebook.com/profile.php?id=100051184789000"                 target="_blank"
@@ -90,7 +93,7 @@ export default function Footer() {
                 Facebook
               </a>
             </li>
-            {/* Whatsapp */}
+            {/* Whatsapp - hover text remains green */}
             <li>
               <a
                 href="https://wa.me/03114666791" // Replace with your actual number
@@ -112,7 +115,8 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="text-center py-4 text-sm text-gray-400 border-t border-gray-700">
+      {/* Copyright text border and color adjusted */}
+      <div className="text-center py-4 text-sm text-muted-foreground border-t border-border">
         © {new Date().getFullYear()} ShopEase. All rights reserved.
       </div>
     </footer>

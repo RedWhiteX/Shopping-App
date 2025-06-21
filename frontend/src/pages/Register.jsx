@@ -40,12 +40,12 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 dark:bg-black">
       <Card className="w-full max-w-md">
         <CardContent className="space-y-4 p-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
-            <p className="text-gray-600 mt-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Account</h2>
+            <p className="text-gray-600 mt-2 dark:text-white">
               Sign up to get started
             </p>
           </div>

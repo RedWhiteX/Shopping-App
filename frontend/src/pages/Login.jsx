@@ -48,12 +48,12 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-black">
       <Card className="w-full max-w-md">
         <CardContent className="p-6">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome Back</h1>
+            <p className="text-gray-600 mt-2 dark:text-white">
               Please enter your credentials to continue
             </p>
           </div>
