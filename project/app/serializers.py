@@ -90,3 +90,82 @@ class FeedbackSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'user', 'content', 'rating', 'created_at']
     def get_user(self, obj):
         return obj.user.username
+
+
+
+
+
+
+
+
+# In your_app/serializers.py
+
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from .models import Order, OrderItem, Product # Import your new models
+
+# Serializer for the built-in User model
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # Fields to expose in the API for admins
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'date_joined']
+
+
+# A simple serializer just for showing product info inside an order
+class OrderProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'price', 'image']
+
+
+# Serializer for the OrderItem model
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = OrderProductSerializer(read_only=True) # Nested product details
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'quantity', 'price']
+
+
+# Main serializer for the Order model
+class OrderSerializer(serializers.ModelSerializer):
+    # 'items' is the related_name we set on the OrderItem model's ForeignKey
+    items = OrderItemSerializer(many=True, read_only=True) 
+    # Show username instead of just user ID
+    user = serializers.StringRelatedField() 
+
+    class Meta:
+        model = Order
+        fields = [
+            'id', 
+            'user', 
+            'customer_name', 
+            'customer_email', 
+            'shipping_address',
+            'total_price', 
+            'status', 
+            'created_at', 
+            'items', # This will be a list of items in the order
+            'shipping_address'
+        ]
+
+
+
+# In app/serializers.py
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+# ... keep all your other serializers ...
+
+# ADD THIS NEW CLASS
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims to the token
+        token['username'] = user.username
+        token['is_staff'] = user.is_staff  # <-- This is the crucial line
+
+        return token

@@ -19,7 +19,6 @@ export function CartProvider({ children }) {
   
 
   useEffect(() => {
-    // Sync cart to localStorage whenever it changes
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
@@ -39,7 +38,6 @@ export function CartProvider({ children }) {
     });
   };
   
-
   const removeFromCart = (productId) => {
     setCart((prevCart) => prevCart.filter(item => item.id !== productId));
   };
@@ -53,6 +51,13 @@ export function CartProvider({ children }) {
     );
   };
 
+  // --- STEP 1: DEFINE THE clearCart FUNCTION ---
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart');
+  };
+  // ------------------------------------------
+
   const cartTotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
@@ -60,7 +65,16 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, cartTotal }}
+      value={{ 
+        cart, 
+        addToCart, 
+        removeFromCart, 
+        updateQuantity, 
+        cartTotal,
+        // --- STEP 2: ADD clearCart TO THE VALUE PROP ---
+        clearCart 
+        // ---------------------------------------------
+      }}
     >
       {children}
     </CartContext.Provider>

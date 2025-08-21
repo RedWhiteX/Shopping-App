@@ -1,11 +1,14 @@
+// In: src/pages/Register.jsx
+
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
+// ✅ STEP 1: Import your custom 'api' instance, NOT the default 'axios'
+import api from "../api";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -17,28 +20,39 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
+    setMsg("");   // Clear previous messages
+
     try {
-      const response = await axios.post(
-        "http://localhost:8002/api/user/register/",
-        { username, password }
-      );
-      console.log("Registration response:", response.data); // Log success
-      setMsg("Registration successful!");
-      navigate("/login");
+      // ✅ STEP 2: Use the 'api' instance with a RELATIVE path
+      const response = await api.post("user/register/", {
+        username,
+        password,
+      });
+
+      console.log("Registration response:", response.data);
+      setMsg("Registration successful! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 2000); // Wait 2 seconds before redirecting
+
     } catch (err) {
       console.error("Full error:", err);
       console.error("Response data:", err.response?.data);
-      setError(err.response?.data?.detail || "Registration failed.");
-    }
-    if (error.response && error.response.data.includes('IntegrityError')) {
-      alert('Username already exists. Please choose a different one.');
+      // Provide more specific error messages
+      if (err.response) {
+        const errorData = err.response.data;
+        const errorMessage = errorData.username?.[0] || errorData.password?.[0] || "Registration failed.";
+        setError(errorMessage);
+      } else {
+        setError("Network error. Please check your connection.");
+      }
     }
   };
 
   const handleLoginClick = () => {
-    navigate("/login"); // Navigate to login page
+    navigate("/login");
   };
 
+  // ... The rest of your return JSX is fine ...
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 dark:bg-black">
       <Card className="w-full max-w-md">
@@ -50,8 +64,8 @@ export default function Register() {
             </p>
           </div>
 
-          {msg && <p className="text-green-500 text-sm">{msg}</p>}
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {msg && <p className="text-green-500 text-center text-sm">{msg}</p>}
+          {error && <p className="text-red-500 text-center text-sm">{error}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -60,7 +74,7 @@ export default function Register() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username is required"
+                placeholder="Enter your username"
                 required
               />
             </div>
@@ -72,7 +86,7 @@ export default function Register() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password is required"
+                  placeholder="Enter your password"
                   required
                   className="pr-10"
                 />
@@ -90,7 +104,6 @@ export default function Register() {
             </Button>
           </form>
 
-          {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}

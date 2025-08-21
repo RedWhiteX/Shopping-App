@@ -99,7 +99,7 @@ const DropdownMenuItem = ({ children, onClick, className = "" }) => {
   return (
     <div
       onClick={handleClick}
-      className={`relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${className}`}
+      className={`relative flex  select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${className}`}
     >
       {children}
     </div>

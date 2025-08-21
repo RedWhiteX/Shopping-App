@@ -178,7 +178,7 @@ export default function BlogPage() {
                   </div>
                   {/* Read more link remains explicit purple */}
                   <Link 
-                    to={`/blog/${post.id}`}
+                    to={`#`}
                     className="flex items-center text-purple-600 hover:text-purple-800 font-medium text-sm transition-colors"
                   >
                     Read more <ArrowRight className="h-4 w-4 ml-1" />

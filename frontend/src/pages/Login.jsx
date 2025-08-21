@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "react-feather";
+import { jwtDecode } from "jwt-decode";
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -22,17 +23,38 @@ export default function Login({ onLogin }) {
     setError("");
 
     try {
+      // Ensure this URL is correct for your setup (e.g., http://localhost:8000)
       const response = await axios.post("http://localhost:8002/api/token/", {
         username,
         password,
       });
 
-      localStorage.setItem("access", response.data.access);
-      localStorage.setItem("refresh", response.data.refresh);
+      const { access, refresh } = response.data;
+      localStorage.setItem("access", access);
+      localStorage.setItem("refresh", refresh);
+
+      const decodedToken = jwtDecode(access);
+
+      // --- IMPORTANT DEBUGGING LINE ---
+      // This will show the token's contents in the browser's console (F12)
+      console.log("DECODED TOKEN:", decodedToken);
+      // --------------------------------
+
+      // Django uses 'is_staff' for admin panel access
+      const isAdmin = decodedToken.is_staff;
 
       if (onLogin) onLogin();
-      navigate("/");
+
+      // Redirect based on role
+      if (isAdmin) {
+        navigate("/admin"); // Redirect admin to the new dashboard
+      } else {
+        navigate("/"); // Redirect normal users to the home page
+      }
+
     } catch (error) {
+      // Also log the full error to the console for better debugging
+      console.error("Login Error:", error); 
       setError(
         error.response?.data?.detail ||
         error.message ||
@@ -44,7 +66,7 @@ export default function Login({ onLogin }) {
   };
 
   const handleRegisterClick = () => {
-    navigate("/register"); // Navigate to registration page
+    navigate("/register");
   };
 
   return (
@@ -114,7 +136,6 @@ export default function Login({ onLogin }) {
             </Button>
           </form>
 
-          {/* Registration Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}

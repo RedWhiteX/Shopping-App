@@ -1,0 +1,23 @@
+# Core Framework
+django
+
+# For Building APIs (Very Important for modern apps)
+djangorestframework
+
+# For Handling Image Uploads (like product pictures)
+Pillow
+
+# Allows your frontend to communicate with your backend
+django-cors-headers
+
+# Database Connector (For PostgreSQL, a popular production database)
+psycopg2-binary
+
+# Production Web Server (To run your app on a real server)
+gunicorn
+
+# For managing secret keys and settings (API keys, passwords)
+django-environ
+
+# For API Authentication using Tokens (securely logs users in)
+djangorestframework-simplejwt
