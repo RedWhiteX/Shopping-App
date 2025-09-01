@@ -33,15 +33,30 @@ export default function Home() {
 
   useEffect(() => {
     api.get("products/").then((res) => {
-      const productList = res.data.results || res.data;
+      let productList = [];
+  
+      if (Array.isArray(res.data.results)) {
+        productList = res.data.results;
+      } else if (Array.isArray(res.data)) {
+        productList = res.data;
+      } else {
+        productList = [];
+      }
+  
       setProducts(productList);
       setFilteredProducts(productList);
+  
       const uniqueCategories = [
         ...new Set(productList.map((product) => product.category).filter(Boolean)),
       ];
       setCategories(uniqueCategories);
+    })
+    .catch((err) => {
+      console.error("Error fetching products:", err);
     });
   }, []);
+  
+  
 
   useEffect(() => {
     filterProducts();

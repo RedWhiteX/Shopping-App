@@ -63,11 +63,7 @@ export default function Navbar() {
         {/* Authentication Buttons (remain explicit colored) */}
         {isLoggedIn ? (
           <>
-            <Button className="bg-yellow-500 hover:bg-yellow-400">
-              <Link to="/profile" className="text-sm font-semibold text-white hover:underline">
-                Profile
-              </Link>
-            </Button>
+            
             <Button onClick={handleLogout} className="bg-red-500 hover:bg-red-400">
               <span className="text-sm font-semibold text-white">Logout</span>
             </Button>
