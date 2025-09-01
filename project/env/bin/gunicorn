@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/home/dell/Desktop/ALL DATA/Shopping app/project/env/bin/python3" "$0" "$@"
+'''exec' "/home/dell/Desktop/Shopping app/project/env/bin/python3" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
