@@ -47,7 +47,7 @@ export default function Login({ onLogin }) {
 
       // Redirect based on role
       if (isAdmin) {
-        navigate("/admin"); // Redirect admin to the new dashboard
+        navigate("/dashboard"); // Redirect admin to the new dashboard
       } else {
         navigate("/"); // Redirect normal users to the home page
       }

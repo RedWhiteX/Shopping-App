@@ -150,65 +150,128 @@ from .models import Order, OrderItem
 
 
 
+# class OrderCreateView(APIView):
+#     permission_classes = []  # This is correct, allows anyone to create an order
+
+#     def post(self, request, *args, **kwargs):
+#         data = request.data
+#         customer_info = data.get('customerInfo')
+#         items = data.get('items')
+
+#         if not customer_info or not items:
+#             return Response({'error': 'Missing customer info or items'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             # --- THIS IS THE FIX (PART 1) ---
+#             # Handle both logged-in users and guest users gracefully.
+#             current_user = None
+#             if request.user.is_authenticated:
+#                 current_user = request.user
+
+#             # Create the main Order object
+#             order = Order.objects.create(
+#                 user=current_user,  # Assigns the user if they exist, otherwise it's NULL
+#                 total_price=data.get('total_price'),
+#                 status='Processing',
+#                 shipping_address=customer_info
+#             )
+
+#             # --- THIS IS THE FIX (PART 2) ---
+#             # Loop through items and ensure each one is valid before creating it.
+#             for item in items:
+#                 product_id = item.get('id')
+#                 if not product_id:
+#                     # Skip items that don't have an ID
+#                     continue
+                
+#                 # Check if the product actually exists in the database
+#                 try:
+#                     product = Product.objects.get(id=product_id)
+#                     OrderItem.objects.create(
+#                         order=order,
+#                         product=product,  # Use the actual product instance
+#                         quantity=item.get('quantity'),
+#                         price=item.get('price')
+#                     )
+#                 except Product.DoesNotExist:
+#                     # If a product in the cart doesn't exist, we can't create an order item for it.
+#                     # We will log this and continue, but in a real app you might want to cancel the whole order.
+#                     print(f"Warning: Product with ID {product_id} not found. Skipping item.")
+
+#             return Response({'success': 'Order created successfully', 'order_id': order.id}, status=status.HTTP_201_CREATED)
+
+#         except Exception as e:
+#             # This will catch any other unexpected errors and prevent a server crash.
+#             # It will also tell you in the terminal exactly what went wrong.
+#             print(f"--- SERVER CRASHED --- \nError creating order: {e}")
+#             return Response({'error': 'An internal server error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class OrderCreateView(APIView):
-    permission_classes = []  # This is correct, allows anyone to create an order
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        customer_info = data.get('customerInfo')
-        items = data.get('items')
+        items_data = data.get('items', [])
+        total_price = data.get('total_price')
 
-        if not customer_info or not items:
-            return Response({'error': 'Missing customer info or items'}, status=status.HTTP_400_BAD_REQUEST)
+        # Create the shipping_address JSON object from the flat data
+        shipping_address_data = {
+            'firstName': data.get('firstName', ''),
+            'lastName': data.get('lastName', ''),
+            'email': data.get('email', ''),
+            'phone': data.get('phone', ''),
+            'country': data.get('country', ''),
+            'city': data.get('city', ''),
+            'address': data.get('address', ''),
+            'zipCode': data.get('zipCode', '')
+        }
 
-        try:
-            # --- THIS IS THE FIX (PART 1) ---
-            # Handle both logged-in users and guest users gracefully.
-            current_user = None
-            if request.user.is_authenticated:
-                current_user = request.user
-
-            # Create the main Order object
-            order = Order.objects.create(
-                user=current_user,  # Assigns the user if they exist, otherwise it's NULL
-                total_price=data.get('total'),
-                status='Processing',
-                shipping_address=customer_info
+        if not items_data or total_price is None:
+            return Response(
+                {'error': 'Missing items or total price'}, 
+                status=status.HTTP_400_BAD_REQUEST
             )
 
-            # --- THIS IS THE FIX (PART 2) ---
-            # Loop through items and ensure each one is valid before creating it.
-            for item in items:
-                product_id = item.get('id')
-                if not product_id:
-                    # Skip items that don't have an ID
-                    continue
-                
-                # Check if the product actually exists in the database
+        try:
+            # Create the main Order object
+            order = Order.objects.create(
+                customer_name=f"{shipping_address_data.get('firstName', '')} {shipping_address_data.get('lastName', '')}",
+                customer_email=shipping_address_data.get('email', ''),
+                shipping_address=shipping_address_data,
+                total_price=total_price,
+                status='Processing',
+                user=request.user if request.user.is_authenticated else None
+            )
+
+            # Create the associated OrderItem objects
+            for item_data in items_data:
                 try:
-                    product = Product.objects.get(id=product_id)
+                    product = Product.objects.get(id=item_data['id'])
                     OrderItem.objects.create(
                         order=order,
-                        product=product,  # Use the actual product instance
-                        quantity=item.get('quantity'),
-                        price=item.get('price')
+                        product=product,
+                        quantity=item_data['quantity'],
+                        # ✅ THIS IS THE FIX: Use the product's price from the database
+                        # This is more secure and reliable.
+                        price=product.price 
                     )
                 except Product.DoesNotExist:
-                    # If a product in the cart doesn't exist, we can't create an order item for it.
-                    # We will log this and continue, but in a real app you might want to cancel the whole order.
-                    print(f"Warning: Product with ID {product_id} not found. Skipping item.")
+                    # If a product is invalid, cancel the whole order and return an error
+                    order.delete() 
+                    return Response({'error': f"Product with ID {item_data['id']} not found."}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({'success': 'Order created successfully', 'order_id': order.id}, status=status.HTTP_201_CREATED)
+            return Response(
+                {'success': 'Order created successfully', 'order_id': order.id}, 
+                status=status.HTTP_201_CREATED
+            )
 
         except Exception as e:
-            # This will catch any other unexpected errors and prevent a server crash.
-            # It will also tell you in the terminal exactly what went wrong.
-            print(f"--- SERVER CRASHED --- \nError creating order: {e}")
-            return Response({'error': 'An internal server error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            # Log the real error to the terminal for debugging
+            print(f"--- ERROR CREATING ORDER ---: {e}") 
+            return Response({'error': 'An internal server error occurred while creating the order.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 from rest_framework.generics import ListAPIView, RetrieveAPIView , DestroyAPIView , UpdateAPIView # 👈 Add RetrieveAPIView
 from rest_framework.permissions import IsAdminUser
+
 class OrderListView(ListAPIView):
     queryset = Order.objects.all().order_by('-created_at')
     serializer_class = OrderSerializer
@@ -229,24 +292,25 @@ class OrderListView(ListAPIView):
         return Response(data)
 
 
-# 👇 ADD THIS ENTIRE CLASS
+# 👇 ADD THIS ENTIRE CLASS.
+from rest_framework import permissions 
 class OrderDetailView(RetrieveAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAdminUser] 
+    permission_classes = [permissions.IsAdminUser] 
 
 
 class OrderDeleteView(DestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer # Not strictly needed for delete, but good practice
-    permission_classes = [IsAdminUser]    
+    permission_classes = [permissions.IsAdminUser]    
 
 
 
 class OrderStatusUpdateView(UpdateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer # You can reuse the main serializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.IsAdminUser]
 
     # This method is called when a PATCH request is made
     def partial_update(self, request, *args, **kwargs):
@@ -320,24 +384,6 @@ class DashboardStatsView(APIView):
 
         return Response(stats)
 
-
-# In your app's views.py
-# In your app's views.py
-# In your app's views.py
-# ... other imports
-
-# You can keep the get_start_date_from_period helper function
-
-# REMOVE the old OrdersExportView and UsersExportView classes
-
-# 👇 ADD THIS NEW, SINGLE VIEW
-# In your app's views.py
-# In your app's views.py
-
-# ... other imports ...
-
-
-# 👇 ADD THIS ENTIRE HELPER FUNCTION 👇
 def get_start_date_from_period(period):
     now = timezone.now()
     if period == 'day':

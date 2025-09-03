@@ -70,10 +70,10 @@ function App() {
 
             {/* === PROTECTED ADMIN ROUTES === */}
             <Route element={<AdminRoute />}>
-              <Route path="/admin" element={<AdminLayout />}>
+              <Route path="/dashboard" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="orders" element={<Orders />} />
-                <Route path="orders/:orderId" element={<OrderDetail />} />
+                <Route path="orders/:id" element={<OrderDetail />} />
                 {/* Add future admin routes here, e.g., for users */}
                 <Route path="users" element={<Users />} />
               </Route>

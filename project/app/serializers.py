@@ -147,7 +147,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'status', 
             'created_at', 
             'items', # This will be a list of items in the order
-            'shipping_address'
+            
         ]
 
 
@@ -167,5 +167,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims to the token
         token['username'] = user.username
         token['is_staff'] = user.is_staff  # <-- This is the crucial line
+        token['is_superuser'] = user.is_superuser 
 
         return token

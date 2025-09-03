@@ -27,14 +27,10 @@ from app.views import MyTokenObtainPairView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api-admin/', admin.site.urls),
     path('api/', include("app.urls")),
     path("api-auth/", include("rest_framework.urls")),
-
-    # Use your custom view for the token endpoint
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-
-    # The refresh endpoint can stay the same
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 

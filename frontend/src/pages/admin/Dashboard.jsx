@@ -6,11 +6,11 @@ import api from '../../api';
 
 // --- Reusable Components for a Clean Layout ---
 
-const StatCard = ({ title, value, icon: Icon, change, loading }) => (
+const StatCard = ({ title, value, icon:Icon,  change, loading }) => (
   <Card className="bg-white dark:bg-black border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-shadow duration-300">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</CardTitle>
-      <Icon className="h-5 w-5 text-gray-400" />
+      {Icon && <Icon className="h-5 w-5 text-gray-400" />}
     </CardHeader>
     <CardContent>
       {loading ? (
